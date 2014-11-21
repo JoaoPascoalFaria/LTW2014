@@ -1,6 +1,5 @@
-<?php
+<?php session_start();
 include("config.php");
-  session_start();
 if($_SERVER["REQUEST_METHOD"] == "POST")
 {
   $username = $_POST['username'];
@@ -24,10 +23,13 @@ echo "Wrong Username or Password";
 }
 }
 echo '<div id="login">Login
-              <ul><form action="" method="post">
-              <li><p>Username: <input type="text" name="username"/></p></li>
-              <li><p>Password: <input type="password" name="pword"/></p></li>
-              <li><p><input type="submit"/></p></li>\
-              </form></ul></div>';
-  
+            <form action="" method="post">
+				<p>Username: <input type="text" name="username"/></p>
+				<p>Password: <input type="password" name="pword"/></p>
+				<p><input type="submit" value="Submit"/></p>
+            </form>
+		</div>
+		<div id="register">
+			<input type="button" onclick="window.location = \'register.php\';" value="Register">
+		</div>';
 ?>

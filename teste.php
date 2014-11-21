@@ -4,9 +4,10 @@ echo '<html>
 <head>
 	<title>Poll</title>
 </head>
-<body> content
+<body>
 <div id="content">
-	</div>
+	teste.php > div content
+</div>
 </body>
 </html>'
 ?>
