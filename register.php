@@ -7,7 +7,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	$pw = $_POST['pw'];
 	
 	$stmt = $db->prepare('SELECT count(IdUser),Permission FROM Utilizador WHERE username = :user');
-	$stmt->bindParam(':user',$username, PDO::PARAM_STR);
+	$stmt->bindParam(':user',$name, PDO::PARAM_STR);
 	$stmt->execute();
 	$result = $stmt->fetch();
 	
