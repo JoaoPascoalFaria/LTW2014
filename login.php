@@ -1,5 +1,7 @@
 <?php session_start();
-include("config.php");
+	include("config.php");
+	unset($_SESSION['error']);
+	unset($_SESSION['success']);
 if($_SERVER["REQUEST_METHOD"] == "POST")
 {
   $username = $_POST['username'];

@@ -1,35 +1,22 @@
 <?php session_start();
 include("config.php");
-  
-if($_SERVER["REQUEST_METHOD"] == "POST") {
-	
-	$name = $_POST['name'];
-	$pw = $_POST['pw'];
-	
-	$stmt = $db->prepare('SELECT count(IdUser),Permission FROM Utilizador WHERE username = :user');
-	$stmt->bindParam(':user',$name, PDO::PARAM_STR);
-	$stmt->execute();
-	$result = $stmt->fetch();
-	
-	if($result[0] == 1) {
-		echo "Failed! Username already exists";
-	}
-	else {
-		$stmt = $db->prepare("INSERT INTO Utilizador (Username,Permission,Pword) VALUES('$name','1','$pw')");
-		$flag = $stmt->execute();
-		if($flag == 1){
-			echo "<script type='text/javascript'>alert(\"Successfully Inserted\"); window.location = \"teste.php\";</script>";
-		}
-		else
-			echo "Failed! An Error has occurred";
-	}
+
+if (isset($_SESSION['error'])){
+?>
+<!-- HTML -->	<div style="color: red;"><?php echo $_SESSION['error']; ?></div>
+<?php
 }
-else {
-	echo
-	'<form id="register" action="" method="post">
-		UserName: <input type="text" name="name"><br/>
-		Password: <input type="password" name="pw"><br/>
-		<input type="submit"/>
-	</form>';
+else if(isset($_SESSION['success'])) {
+?>
+<!-- HTML -->	<div style="color: green;"><?php echo $_SESSION['success']; ?></div> 
+<!-- HTML -->	<script type='text/javascript'>setTimeout(function() { window.location = "teste.php"; }, 3000);</script>
+<?php
 }
 ?>
+
+
+<form id="register" action="controller.php?method=register" method="post">
+	UserName: <input type="text" name="name"><br/>
+	Password: <input type="password" name="pw"><br/>
+	<input type="submit"/>
+</form>
