@@ -1,6 +1,5 @@
 <?php session_start();
-if(session_destroy())
-{
-header("Location: teste.php");
+if(session_destroy()) {
+	header("Location: teste.php");
 }
 ?>
