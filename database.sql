@@ -6,7 +6,7 @@ DROP Table UtilizadorPoll;
 
 CREATE TABLE Utilizador (
 IdUser Integer PRIMARY KEY AUTOINCREMENT,
-Username NVARCHAR2(50) Unique,
+Username NVARCHAR2(50) Unique NOT NULL,
 Permission Integer,
 Pword NVARCHAR2(50) NOT NULL
 );
@@ -52,15 +52,15 @@ INSERT INTO Question (PollId, Text) VALUES
 	('2' ,'Quest2'),
 	('3' ,'Quest1');
 	
-INSERT INTO Answer (QuestionId, Text) VALUES
-	('1' ,'A1'),
-	('1' ,'A2'),
-	('1' ,'A3'),
-	('2' ,'A4'),
-	('3' ,'A5'),
-	('4' ,'A6'),
-	('5' ,'A8'),
-	('6' ,'A9');
+INSERT INTO Answer (QuestionId, Text, VotesCount) VALUES
+	('1' ,'A1','0'),
+	('1' ,'A2','0'),
+	('1' ,'A3','0'),
+	('2' ,'A4','0'),
+	('3' ,'A5','0'),
+	('4' ,'A6','0'),
+	('5' ,'A8','0'),
+	('6' ,'A9','0');
 	
 INSERT INTO UtilizadorPoll (idUtilizador, idPoll) VALUES
 	('1' ,'1'),

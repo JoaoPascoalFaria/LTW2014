@@ -20,6 +20,6 @@
 		<p><input type="submit" value="Submit"/></p>
 	</form>
 </div>
-<div id="register">
+<div id="registerbt">
 	<input type="button" onclick="window.location = 'register.php';" value="Register"/>
 </div>

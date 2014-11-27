@@ -4,9 +4,14 @@ include('config.php');
 
 if(isset($_SESSION['username'])) {
 	echo 'welcome '.$_SESSION['username'];
-	echo '<form action="logout.php" method="get">
-		<button name="logout" type="submit" >Logout</button>
-		</form>';
+?>
+<form action="logout.php" method="get">
+	<button name="logout" type="submit" >Logout</button>
+</form>
+<div id="createpollbt">
+	<input type="button" onclick="window.location = 'createpoll.php';" value="Create Poll"/>
+</div>
+<?php
 }
 else {
 	header("Location: login.php");
