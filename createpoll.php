@@ -16,9 +16,12 @@
 ?>
 
 
-<form id="register" action="controller.php?method=register" method="post">
-	<p>UserName: <input type="text" name="name"></p>
-	<p>Password: <input type="password" name="pw"></p>
+<form id="createpoll" action="controller.php?method=createpoll" method="post">
+	<p>Title: <input type="text" name="title"></p>
+	<p><input type="checkbox" name="private"> Private</p>
+	<p>Question: <input type="text" name="question"></p>
+	<p>Answer: <input type="text" name="answer1"></p>
+	<p>Answer: <input type="text" name="answer2"></p>
 	<p><input type="submit" value="Submit"/></p>
 </form>
 <input type="button" onclick="window.location = 'login.php';" value="Return"/>
