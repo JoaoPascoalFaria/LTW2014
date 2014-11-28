@@ -39,7 +39,7 @@ include("config.php");
 		$username = $_POST['username'];
 		$pword = $_POST['pword'];
 		
-		$stmt = $db->prepare('SELECT count(IdUser) FROM Utilizador WHERE username = :user AND pword = :pword');
+		$stmt = $db->prepare('SELECT count(IdUser), Permission, IdUser FROM Utilizador WHERE username = :user AND pword = :pword');
 		$stmt->bindParam(':user',$username, PDO::PARAM_STR);
 		$stmt->bindParam(':pword',$pword, PDO::PARAM_STR);
 		$stmt->execute();
@@ -49,6 +49,7 @@ include("config.php");
 			// store session data
 			$_SESSION['username']=$username;
 			$_SESSION['Permission']=$result[1];
+			$_SESSION['id']=$result[2];
 		}
 		else {
 			$_SESSION['error'] = "Wrong Username or Password";
@@ -58,15 +59,11 @@ include("config.php");
 	
 	function createpoll() {
 		global $db;
-		if( isset($_POST['title']) and isset($_SESSION['username'])){
+		if( isset($_POST['title']) and isset($_SESSION['id'])){
 			
 			$title = $_POST['title'];
 			$qst = $_POST['question[]'];
-			$ans = $_POST['answer[]'];
-
-			var_dump($qst);
-			var_dump($ans);
-			
+			$ans = $_POST['answer[]'];			
 			$priv = $_POST['Polltype'];
 			$user = $_SESSION['username'];
 			
@@ -80,39 +77,25 @@ include("config.php");
 			}
 			else {
 				/* Poll */
-				$stmt = $db->prepare('SELECT IdUser FROM Utilizador WHERE Username = :usr');
-				$stmt->bindParam(':usr',$user, PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetch();
-				$userID = $result[0];
-				
+				$userID = $_SESSION['id'];
 				$stmt = $db->prepare("INSERT INTO Poll (Owner,Title,PrivatePoll) VALUES('$userID','$title','$priv')");
 				$flag = $stmt->execute();
 				if($flag != 1){
 					$_SESSION['error'] = "Failed! An Error has occurred while creating poll";
 					header("Location: createpoll.php");
 				}
-				/* Question */
-				$stmt = $db->prepare('SELECT Id FROM Poll WHERE Title = :titl');
-				$stmt->bindParam(':titl',$title, PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetch();
-				$pollID = $result[0];
 				
+				/* Question */
+				$pollID = $db->lastInsertId();
 				$stmt = $db->prepare("INSERT INTO Question (PollId,Text) VALUES('$pollID','$qst[0]')");
 				$flag = $stmt->execute();
 				if($flag != 1){
 					$_SESSION['error'] = "Failed! An Error has occurred while creating question";
 					header("Location: createpoll.php");
 				}
-				/* Answer */
-				$stmt = $db->prepare('SELECT Id FROM Question WHERE Text = :quest AND PollId = :pid');
-				$stmt->bindParam(':quest',$qst, PDO::PARAM_STR);
-				$stmt->bindParam(':pid',$pollID, PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetch();
-				$questionID = $result[0];
 				
+				/* Answer */
+				$questionID = $db->lastInsertId();
 				$stmt = $db->prepare("INSERT INTO Answer (QuestionId,Text,VotesCount) VALUES('$questionID','$ans[0]','0')");
 				$flag = $stmt->execute();
 				if($flag != 1){

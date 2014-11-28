@@ -1,6 +1,6 @@
 <?php session_start();
 
-	if(isset($_SESSION['username'])) {
+	if(isset($_SESSION['username']) and isset($_SESSION['id'])) {
 		header("location: teste.php");
 	}
 	else if(isset($_SESSION['error'])) {
