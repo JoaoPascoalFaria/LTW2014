@@ -77,11 +77,7 @@ include("config.php");
 			}
 			else {
 				/* Poll */
-				$stmt = $db->prepare('SELECT IdUser FROM Utilizador WHERE Username = :usr');
-				$stmt->bindParam(':usr',$user, PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetch();
-				$userID = $result[0];
+				$userID = $_SESSION['id'];
 				
 				$stmt = $db->prepare("INSERT INTO Poll (Owner,Title,PrivatePoll) VALUES('$userID','$title','$priv')");
 				$flag = $stmt->execute();
@@ -90,11 +86,7 @@ include("config.php");
 					header("Location: createpoll.php");
 				}
 				/* Question */
-				$stmt = $db->prepare('SELECT Id FROM Poll WHERE Title = :titl');
-				$stmt->bindParam(':titl',$title, PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetch();
-				$pollID = $result[0];
+				$pollID = $db->lastInsertId();
 				
 				$stmt = $db->prepare("INSERT INTO Question (PollId,Text) VALUES('$pollID','$qst')");
 				$flag = $stmt->execute();
@@ -102,13 +94,9 @@ include("config.php");
 					$_SESSION['error'] = "Failed! An Error has occurred while creating question";
 					header("Location: createpoll.php");
 				}
+				
 				/* Answer */
-				$stmt = $db->prepare('SELECT Id FROM Question WHERE Text = :quest AND PollId = :pid');
-				$stmt->bindParam(':quest',$qst, PDO::PARAM_STR);
-				$stmt->bindParam(':pid',$pollID, PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetch();
-				$questionID = $result[0];
+				$questionID = $db->lastInsertId();
 				
 				$stmt = $db->prepare("INSERT INTO Answer (QuestionId,Text,VotesCount) VALUES('$questionID','$ans1','0')");
 				$flag = $stmt->execute();

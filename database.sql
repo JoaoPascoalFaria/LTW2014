@@ -15,6 +15,7 @@ CREATE TABLE Poll (
 Id Integer PRIMARY KEY AUTOINCREMENT,
 Owner Integer NOT NULL,
 Title NVARCHAR2(50) Unique NOT NULL,
+URL NVARCHAR2(50) Unique NOT NULL,
 PrivatePoll BOOLEAN NOT NULL,
 FOREIGN KEY (Owner) REFERENCES Utilizador(IdUser)
 );
@@ -28,15 +29,14 @@ Text NVARCHAR2(250) NOT NULL
 CREATE TABLE Answer (
 Id Integer PRIMARY KEY AUTOINCREMENT,
 QuestionId Integer NOT NULL REFERENCES Question(Id),
-Text NVARCHAR2(250) NOT NULL,
-VotesCount Integer 
+Text NVARCHAR2(250) NOT NULL
 );
 
 /* Utilizadores que responderam a Poll */
-CREATE TABLE UtilizadorPoll (
+CREATE TABLE UtilizadorAnswer (
  idUtilizador Integer references Utilizador(IdUser),
- idPoll Integer references Poll(Id),
- primary key (idUtilizador, idPoll)
+ idAnswer Integer references Answer(Id),
+ primary key (idUtilizador, idAnswer)
 );
 
 INSERT INTO Poll (Owner,Title,PrivatePoll) VALUES
