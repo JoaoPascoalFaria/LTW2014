@@ -1,22 +1,5 @@
-<?php session_start();
-
-	if (isset($_SESSION['error'])){
-?>
-<!-- HTML -->	<div style="color: red;"><?php echo $_SESSION['error']; ?></div>
-<?php
-	}
-	else if(isset($_SESSION['success'])) {
-?>
-<!-- HTML -->	<div style="color: green;"><?php echo $_SESSION['success']; ?></div> 
-<!-- HTML -->	<script type='text/javascript'>setTimeout(function() { window.location = "teste.php"; }, 3000);</script>
-<?php
-	}
-	unset($_SESSION['error']);
-	unset($_SESSION['success']);
-?>
-
 <html>
-<head>
+	<head>Formulario Poll
 		<script src="jquery-1.10.2.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="Pollstyle.css">
 		<script>
@@ -55,13 +38,14 @@ choice.addEventListener( "click", function( event ) {
     console.log( event.target );
 });
 });
-</script>
-</head>
+///$( "input[name^='news']" ).val( "news here!" );
+		</script>
 
+	</head>
 	<body>
 
-	<form action="controller.php?method=createpoll" method="post">
-		<p>Title: <input type="text" name="title"></p>
+
+		<form action="controller.php?method=createpoll" method="post">
 			<input type="radio" name="Polltype" value="public" checked>Public
 			<br>
 			<input type="radio" name="Polltype" value="private">Private
@@ -71,7 +55,5 @@ choice.addEventListener( "click", function( event ) {
 			<input type="submit" value="Submit">
 		</form>
 
-<input type="button" onclick="window.location = 'login.php';" value="Return"/>
-
-</body>
+	</body>
 </html>

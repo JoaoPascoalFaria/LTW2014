@@ -1,0 +1,15 @@
+.choicebox { 
+    background-color: yellow;
+}
+
+.questionbox { 
+    background-color: blue;
+}
+
+.poll_wrap{
+ background-color : red;
+}
+
+.choices_wrap{
+ background-color : white;
+}
