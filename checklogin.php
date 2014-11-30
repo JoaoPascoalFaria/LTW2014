@@ -11,6 +11,9 @@ if(isset($_SESSION['username'])) {
 <div id="createpollbt">
 	<input type="button" onclick="window.location = 'createpoll.php';" value="Create Poll"/>
 </div>
+<div id="showpollbt">
+	<input type="button" onclick="window.location = 'showpoll.php';" value="Show Poll"/>
+</div>
 <?php
 }
 else {

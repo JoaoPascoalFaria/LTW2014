@@ -62,8 +62,7 @@ include("config.php");
 		if( isset($_POST['title']) and isset($_SESSION['id'])){
 			
 			$title = $_POST['title'];
-			$qst = $_POST['question[]'];
-			$ans = $_POST['answer[]'];			
+			$qst = $_POST['question'];
 			$priv = $_POST['Polltype'];
 			$user = $_SESSION['username'];
 			
@@ -87,22 +86,26 @@ include("config.php");
 				
 				/* Question */
 				$pollID = $db->lastInsertId();
-				$stmt = $db->prepare("INSERT INTO Question (PollId,Text) VALUES('$pollID','$qst[0]')");
-				$flag = $stmt->execute();
-				if($flag != 1){
-					$_SESSION['error'] = "Failed! An Error has occurred while creating question";
-					header("Location: createpoll.php");
+				for($i = 0; $i < count($qst); $i++) {
+					$stmt = $db->prepare("INSERT INTO Question (PollId,Text) VALUES('$pollID','$qst[$i]')");
+					$flag = $stmt->execute();
+					if($flag != 1){
+						$_SESSION['error'] = "Failed! An Error has occurred while creating question";
+						header("Location: createpoll.php");
+					}
+					
+					/* Answer */
+					$questionID = $db->lastInsertId();
+					$ans = $_POST['answer'.$i];
+					for($j = 0; $j < count($ans); $j++) {
+						$stmt = $db->prepare("INSERT INTO Answer (QuestionId,Text) VALUES('$questionID','$ans[$j]')");
+						$flag = $stmt->execute();
+						if($flag != 1){
+							$_SESSION['error'] = "Failed! An Error has occurred while creating answer 1";
+							header("Location: createpoll.php");
+						}
+					}
 				}
-				
-				/* Answer */
-				$questionID = $db->lastInsertId();
-				$stmt = $db->prepare("INSERT INTO Answer (QuestionId,Text,VotesCount) VALUES('$questionID','$ans[0]','0')");
-				$flag = $stmt->execute();
-				if($flag != 1){
-					$_SESSION['error'] = "Failed! An Error has occurred while creating answer 1";
-					header("Location: createpoll.php");
-				}
-				
 				$_SESSION['success'] = "Successfully created Poll";
 			}
 		}
