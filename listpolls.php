@@ -1,17 +1,28 @@
 <?php session_start(); 
-	if (isset($_SESSION['ownpolls']) and isset($_SESSION['ownpollsIds']) ){
+	if (isset($_SESSION['poolsT_array'])){
 		?>
 		<!-- HTML -->	<p>User: <?php echo $_SESSION['id']; ?></p>
 		<?php
-		for($i = 0; $i < count($_SESSION['ownpolls']); $i++) {
-			echo "<br>",$_SESSION['ownpollsIds'][$i],$_SESSION['ownpolls'][$i]; ?><br>
+		for($i = 0; $i < count($_SESSION['poolsT_array']); $i++) {
+			echo "<br>", $_SESSION['id_array'][$i], $_SESSION['poolsT_array'][$i],$_SESSION['owner_array'][$i],[$i]; ?><br>
 		<?php
 		}
+
+		/*
+$_SESSION['poolsT_array']=$pools_array;
+			$_SESSION['id_array']=$id_array;
+			$_SESSION['owner_array']=$owner_array;
+		
+		*/
 	}
 	else {
 				?>
 			<form action="controller.php?method=retrieve_all_owner_polls" method="post" >
 			<input type="submit" value="Retrive owner polls">
+		</form>
+
+		<form action="controller.php?method=retrieve_all_polls" method="post" >
+			<input type="submit" value="Retrive all public polls">
 		</form>
 		
 		<?php

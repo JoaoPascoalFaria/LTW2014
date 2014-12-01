@@ -218,7 +218,30 @@ include("config.php");
 		header("Location: listpolls.php");
 	}
 
-	
+	function retrieve_all_polls()
+	{
+		global $db;
+
+			$stmt = $db->prepare('SELECT Id , Title,Owner FROM Poll WHERE PrivatePoll=0 ');
+			$stmt->execute();
+			$result = $stmt->fetchall();
+
+			$pools_array=array();
+			$id_array=array();
+			$owner_array= array();
+
+			for($i = 0; $i < count($result); $i++) {
+				array_push($poolsT_array, $result[$i]['Title']);
+				array_push($owner_array, $result[$i]['Owner']);
+				array_push($id_array, $result[$i]['Id']);
+			}
+			$_SESSION['poolsT_array']=$pools_array;
+			$_SESSION['id_array']=$id_array;
+			$_SESSION['owner_array']=$owner_array;
+		
+		header("Location: listpolls.php");
+}
+
 	function router()
 	{
 		$method = $_GET['method'];
@@ -234,6 +257,8 @@ include("config.php");
 			nextpoll();
 		else if($method == "retrieve_all_owner_polls")
 			retrieve_all_owner_polls();
+		else if($method == "retrieve_all_polls")
+			retrieve_all_polls();
 
 	}
 	
