@@ -14,6 +14,11 @@ if(isset($_SESSION['username'])) {
 <div id="showpollbt">
 	<input type="button" onclick="window.location = 'showpoll.php';" value="Show Poll"/>
 </div>
+<div id="listpolls">
+	<input type="button" onclick="window.location = 'listpolls.php';" value="List Polls"/>
+	</div>
+
+
 <?php
 }
 else {

@@ -194,6 +194,30 @@ include("config.php");
 		}
 		header("Location: showpoll.php");
 	}
+
+
+	function retrieve_all_owner_polls() {
+		global $db;
+		if( isset( $_SESSION['id'])) {
+			
+			$id = $_SESSION['id'];
+			$stmt = $db->prepare('SELECT Id , Title FROM Poll WHERE Owner = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetchall();
+		
+			$ownerpoolsI=array();
+			$ownerpoolsT = array();
+			for($i = 0; $i < count($result); $i++) {
+				array_push($ownerpoolsI, $result[$i]['Id']);
+				array_push($ownerpoolsT, $result[$i]['Title']);
+			}
+			$_SESSION['ownpolls']=$ownerpoolsT;
+			$_SESSION['ownpollsIds']=$ownerpoolsI;
+		}
+		header("Location: listpolls.php");
+	}
+
 	
 	function router()
 	{
@@ -208,6 +232,9 @@ include("config.php");
 			retrievepoll();
 		else if($method == "nextpoll")
 			nextpoll();
+		else if($method == "retrieve_all_owner_polls")
+			retrieve_all_owner_polls();
+
 	}
 	
 	router();
