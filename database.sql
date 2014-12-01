@@ -2,7 +2,7 @@ DROP Table Utilizador;
 DROP Table Poll;
 DROP Table Question;
 DROP Table Answer;
-DROP Table UtilizadorAnswer;
+DROP Table UtilizadorPoll;
 
 CREATE TABLE Utilizador (
 IdUser Integer PRIMARY KEY AUTOINCREMENT,
@@ -28,14 +28,15 @@ Text NVARCHAR2(250) NOT NULL
 CREATE TABLE Answer (
 Id Integer PRIMARY KEY AUTOINCREMENT,
 QuestionId Integer NOT NULL REFERENCES Question(Id),
-Text NVARCHAR2(250) NOT NULL
+Text NVARCHAR2(250) NOT NULL,
+VotesCount Integer 
 );
 
 /* Utilizadores que responderam a Poll */
-CREATE TABLE UtilizadorAnswer (
+CREATE TABLE UtilizadorPoll (
  idUtilizador Integer references Utilizador(IdUser),
- idAnswer Integer references Answer(Id),
- primary key (idUtilizador, idAnswer)
+ idPoll Integer references Poll(Id),
+ primary key (idUtilizador, idPoll)
 );
 
 INSERT INTO Poll (Owner,Title,PrivatePoll) VALUES
@@ -51,17 +52,17 @@ INSERT INTO Question (PollId, Text) VALUES
 	('2' ,'Quest2'),
 	('3' ,'Quest1');
 	
-INSERT INTO Answer (QuestionId, Text) VALUES
-	('1' ,'A1'),
-	('1' ,'A2'),
-	('1' ,'A3'),
-	('2' ,'A4'),
-	('3' ,'A5'),
-	('4' ,'A6'),
-	('5' ,'A8'),
-	('6' ,'A9');
+INSERT INTO Answer (QuestionId, Text, VotesCount) VALUES
+	('1' ,'A1','0'),
+	('1' ,'A2','0'),
+	('1' ,'A3','0'),
+	('2' ,'A4','0'),
+	('3' ,'A5','0'),
+	('4' ,'A6','0'),
+	('5' ,'A8','0'),
+	('6' ,'A9','0');
 	
-INSERT INTO UtilizadorAnswer (idUtilizador, idAnswer) VALUES
+INSERT INTO UtilizadorPoll (idUtilizador, idPoll) VALUES
 	('1' ,'1'),
 	('1' ,'2');
 
