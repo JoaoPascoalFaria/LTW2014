@@ -22,6 +22,11 @@
 		}
 		unset($_SESSION['polltitle']);
 		unset($_SESSION['questions']);
+		?>
+		<form action="controller.php?method=nextpoll" method="post">
+			<input type="submit" value="Next Poll">
+		</form>
+		<?php
 	}
 	else {
 		?>
