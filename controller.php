@@ -111,19 +111,15 @@ include("config.php");
 		}
 		header("Location: createpoll.php");
 	}
-	
-	function retrievepoll() {
-		global $db;
-		if( isset( $_POST['id'])) {
-			
-			$id = $_POST['id'];
-			$_SESSION['pollid'] = $id;
-			
-			$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
+
+
+	function retrievepollbyid($id){
+global $db;
+$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
 			$stmt->execute();
 			$result = $stmt->fetch();
-			$_SESSION['polltitle'] = $result[0];
+			$_SESSION['poolsT_array'][$id]= $result[0];
 			
 			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
 			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
@@ -148,50 +144,33 @@ include("config.php");
 					array_push($answers, $result[$j]['Text']);
 				}
 				$_SESSION['q'.$i.'answer'] = $answers;
-			}
-		}
+
+	}
+	header("Location: showpoll.php");
+}
+	
+	function retrievepoll() {
+		
+			if( isset( $_POST['id'])) 
+			{
+		
+			$id = $_POST['id'];
+			$_SESSION['pollid'] = $id;
+			retrievepollbyid($id);
+
+	}
 		header("Location: showpoll.php");
+
 	}
 
 	function nextpoll()
 	{
-		global $db;
 		if( isset( $_SESSION['pollid'])) {
-			
-			$id = $_SESSION['pollid'] + 1;
-			$_SESSION['pollid'] ++ ;
-			
-			$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
-			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
-			$stmt->execute();
-			$result = $stmt->fetch();
-			$_SESSION['polltitle'] = $result[0];
-			
-			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
-			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
-			$stmt->execute();
-			$result = $stmt->fetchall();
-			$qsts = array();
-			$ids = array();
-			for($i = 0; $i < count($result); $i++) {
-				
-				array_push($ids, $result[$i]['Id']);
-				array_push($qsts, $result[$i]['Text']);
-			}
-			$_SESSION['questions'] = $qsts;
-			for($i = 0; $i < count($ids); $i++) {
-				$stmt = $db->prepare('SELECT Text FROM Answer WHERE QuestionId = :id');
-				$stmt->bindParam(':id',$ids[$i], PDO::PARAM_STR);
-				$stmt->execute();
-				$result = $stmt->fetchall();
-				$answers = array();
-				for($j = 0; $j < count($result); $j++) {
-					var_dump($result[$j]);
-					array_push($answers, $result[$j]['Text']);
-				}
-				$_SESSION['q'.$i.'answer'] = $answers;
-			}
+			$_SESSION['pollid']++ ;
+			retrievepollbyid($_SESSION['pollid']);
 		}
+			
+			
 		header("Location: showpoll.php");
 	}
 

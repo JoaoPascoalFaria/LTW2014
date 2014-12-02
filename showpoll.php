@@ -1,8 +1,7 @@
 <?php session_start();
-
-	if (isset($_SESSION['polltitle'])){
+	if (isset($_SESSION['poolsT_array'])){
 		?>
-		<!-- HTML -->	<p>Title: <?php echo $_SESSION['polltitle']; ?></p>
+		<!-- HTML -->	<p>Title: <?php echo $_SESSION['poolsT_array'][$_SESSION['pollid']]; ?></p>
 		<!-- HTML -->	<p id="questions">Questions:<br>
 		<?php
 		for($i = 0; $i < count($_SESSION['questions']); $i++) {
@@ -20,7 +19,7 @@
 			</p>
 			<?php
 		}
-		unset($_SESSION['polltitle']);
+		unset($_SESSION['poolsT_array']);
 		unset($_SESSION['questions']);
 		?>
 		<form action="controller.php?method=nextpoll" method="post">
@@ -29,6 +28,7 @@
 		<?php
 	}
 	else {
+
 		?>
 		<!-- MUDAR PARA GET -->
 		<form action="controller.php?method=retrievepoll" method="post">
