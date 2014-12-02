@@ -201,11 +201,11 @@ $stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 	{
 		global $db;
 
-			$stmt = $db->prepare('SELECT Id , Title,Owner FROM Poll WHERE PrivatePoll=0 ');
+			$stmt = $db->prepare('SELECT Id , Title,Owner FROM Poll ');
 			$stmt->execute();
 			$result = $stmt->fetchall();
 
-			$pools_array=array();
+			$poolsT_array=array();
 			$id_array=array();
 			$owner_array= array();
 
@@ -214,9 +214,10 @@ $stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 				array_push($owner_array, $result[$i]['Owner']);
 				array_push($id_array, $result[$i]['Id']);
 			}
-			$_SESSION['poolsT_array']=$pools_array;
+			$_SESSION['poolsT_array']=$poolsT_array;
 			$_SESSION['id_array']=$id_array;
 			$_SESSION['owner_array']=$owner_array;
+
 		
 		header("Location: listpolls.php");
 }
