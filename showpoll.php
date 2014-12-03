@@ -14,16 +14,19 @@
 				?>
 			</p>
 			<?php
-			unset($_SESSION['q'.$i.'answer']);
+		//	unset($_SESSION['q'.$i.'answer']);
 			?>
 			</p>
 			<?php
 		}
-		unset($_SESSION['poolsT_array']);
-		unset($_SESSION['questions']);
+	//	unset($_SESSION['poolsT_array']);
+	//	unset($_SESSION['questions']);
 		?>
 		<form action="controller.php?method=nextpoll" method="post">
 			<input type="submit" value="Next Poll">
+		</form>
+		<form action="controller.php?method=edit_poll" method="post">
+			<input type="submit" value="Edit Mode">
 		</form>
 		<?php
 	}

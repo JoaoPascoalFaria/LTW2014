@@ -5,16 +5,17 @@
 		<?php
 		echo count($_SESSION['poolsT_array']);
 		for($i = 0; $i < count($_SESSION['poolsT_array']); $i++) {
-			echo "<br>", $_SESSION['poolsT_array'][$i]; ?><br>
+			echo "<div class='poll'>";
+			echo "<p>", $_SESSION['id_array'][$i]; ?></p>
+			<?php
+			echo "<p>", $_SESSION['poolsT_array'][$i]; ?></p>
+			<?php
+			echo "<p>", $_SESSION['owner_array'][$i]; ?></p>
 		<?php
+		echo "</div>";
 		}
 
-		/*
-			$_SESSION['poolsT_array']=$pools_array;
-			$_SESSION['id_array']=$id_array;
-			$_SESSION['owner_array']=$owner_array;
-		
-		*/
+
 	}
 	else {
 				?>
