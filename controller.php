@@ -243,14 +243,20 @@ function edit_poll()
 	<button class="add_poll_question">Add More Questions</button>
 			<div id="Questions"> 
 			<?php 
+			echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ;
 			for($i=0; $i < count( $_SESSION['questions'] ) ; $i++)
 			{
 				echo $_SESSION['questions'][$i];
-				
+				for ($j=0; $j < count($_SESSION['q'.$i.'answer']); $j++ )
+				{
+					echo $_SESSION['q'.$i.'answer'][$j];
+				}
+
 			}
 				?>
 			</div>
-			<input type="submit" value="Submit">
+			<input type="text" placeholder="<?php echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ?>" >
+			<input type="submit" value="submit">
 			<?php
 	///$_SESSION['pollid'] $_SESSION['q'.$i.'answer'] = $answers;$_SESSION['questions'] 
 
