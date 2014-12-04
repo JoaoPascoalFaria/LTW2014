@@ -133,12 +133,19 @@ include("config.php");
 			$result = $stmt->fetch();
 			$_SESSION['polltitle'] = $result[0];
 			
+			$stmt = $db->prepare('SELECT Image FROM Poll WHERE Id = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			$_SESSION['pollImage'] = $result[0];
+			
 			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
 			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
 			$stmt->execute();
 			$result = $stmt->fetchall();
 			$qsts = array();
 			$ids = array();
+			
 			for($i = 0; $i < count($result); $i++) {
 				
 				array_push($ids, $result[$i]['Id']);
@@ -172,6 +179,12 @@ include("config.php");
 			$stmt->execute();
 			$result = $stmt->fetch();
 			$_SESSION['polltitle'] = $result[0];
+			
+			$stmt = $db->prepare('SELECT Image FROM Poll WHERE Id = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			$_SESSION['pollImage'] = $result[0];
 			
 			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
 			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
