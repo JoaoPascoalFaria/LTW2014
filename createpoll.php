@@ -52,6 +52,7 @@
 	<body>
 		<form action="controller.php?method=createpoll" method="post">
 			<p>Title: <input type="text" name="title"></p>
+			<p>Image URL: <input type="text" name="image"></p> 
 			<input type="radio" name="Polltype" value="public" checked>Public
 			<br>
 			<input type="radio" name="Polltype" value="private">Private

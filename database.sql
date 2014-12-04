@@ -15,6 +15,7 @@ CREATE TABLE Poll (
 Id Integer PRIMARY KEY AUTOINCREMENT,
 Owner Integer NOT NULL,
 Title NVARCHAR2(50) Unique NOT NULL,
+Image NVARCHAR2(300) NOT NULL,
 PrivatePoll BOOLEAN NOT NULL,
 FOREIGN KEY (Owner) REFERENCES Utilizador(IdUser)
 );
@@ -39,10 +40,10 @@ CREATE TABLE UtilizadorAnswer (
  primary key (idUtilizador, idAnswer)
 );
 
-INSERT INTO Poll (Owner,Title,PrivatePoll) VALUES
-	('1' ,'Poll1','public'),
-	('1' ,'Poll2','public'),
-	('1' ,'Poll3','private');
+INSERT INTO Poll (Owner,Title,Image,PrivatePoll) VALUES
+	('1' ,'Poll1','http://i.imgur.com/C9EXH62.jpg','public'),
+	('1' ,'Poll2','http://i.imgur.com/nScazCd.jpg','public'),
+	('1' ,'Poll3','http://i.imgur.com/YbsUWRR.jpg','private');
 	
 INSERT INTO Question (PollId, Text) VALUES
 	('1' ,'Quest1'),

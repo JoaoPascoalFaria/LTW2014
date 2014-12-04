@@ -78,8 +78,14 @@ include("config.php");
 			}
 			else {
 				/* Poll */
+				
+				//Cenas referente a imagem 
+				if(isDomainAvailable($imag)){}
+				else
+				{$imag = 'images/default.jpg';}
+				
 				$userID = $_SESSION['id'];
-				$stmt = $db->prepare("INSERT INTO Poll (Owner,Title,PrivatePoll) VALUES('$userID','$title','$priv')");
+				$stmt = $db->prepare("INSERT INTO Poll (Owner,Title,Image,PrivatePoll) VALUES('$userID','$title','$imag','$priv')");
 				$flag = $stmt->execute();
 				if($flag != 1){
 					$_SESSION['error'] = "Failed! An Error has occurred while creating poll";
@@ -331,6 +337,27 @@ include("config.php");
 		else if ($method == "retrievepollforvote")
 			retrievepollforvote();
 	}
+	
+		function isDomainAvailable($domain)
+	{
+
+	if(!filter_var($domain, FILTER_VALIDATE_URL))
+		{
+			return false;
+		}
+		
+		$curlInit = curl_init($domain);
+		curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
+		curl_setopt($curlInit,CURLOPT_HEADER,true);
+		curl_setopt($curlInit,CURLOPT_NOBODY,true);
+		curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
+		//get answer
+		$response = curl_exec($curlInit);
+		curl_close($curlInit);
+		if ($response) return true;
+		return false;
+	}	
+	
 	
 	router();
 ?>
