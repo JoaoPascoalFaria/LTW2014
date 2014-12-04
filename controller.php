@@ -9,7 +9,7 @@ include("config.php");
 	
 		if( isset($_POST['name'])){
 			
-			$name = $_POST['name'];
+			$name = strtoupper($_POST['name']);
 			$pw = $_POST['pw'];
 			
 			$stmt = $db->prepare('SELECT count(IdUser) FROM Utilizador WHERE username = :user');
@@ -21,7 +21,8 @@ include("config.php");
 				$_SESSION['error'] = "Failed! Username already exists";
 			}
 			else {
-				$stmt = $db->prepare("INSERT INTO Utilizador (Username,Permission,Pword) VALUES('$name','1','$pw')");
+				$encryptedPass = md5($pw);
+				$stmt = $db->prepare("INSERT INTO Utilizador (Username,Permission,Pword) VALUES('$name','1','$encryptedPass')");
 				$flag = $stmt->execute();
 				if($flag == 1){
 					$_SESSION['success'] = "Successfully Inserted";
@@ -37,12 +38,12 @@ include("config.php");
 	function login() {
 		global $db;
 		
-		$username = $_POST['username'];
+		$username = strtoupper($_POST['username']);
 		$pword = $_POST['pword'];
-		
+		$encryptedPass = md5($pword);
 		$stmt = $db->prepare('SELECT count(IdUser), Permission, IdUser FROM Utilizador WHERE username = :user AND pword = :pword');
 		$stmt->bindParam(':user',$username, PDO::PARAM_STR);
-		$stmt->bindParam(':pword',$pword, PDO::PARAM_STR);
+		$stmt->bindParam(':pword',$encryptedPass, PDO::PARAM_STR);
 		$stmt->execute();
 		$result = $stmt->fetch();
 
@@ -112,15 +113,19 @@ include("config.php");
 		}
 		header("Location: createpoll.php");
 	}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	function retrievepollbyid($id){
-global $db;
-$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
+	function retrievepoll() {
+		global $db;
+		if( isset( $_POST['id'])) {
+			
+			$id = $_POST['id'];
+			$_SESSION['pollid'] = $id;
+			
+			$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
 			$stmt->execute();
 			$result = $stmt->fetch();
-			$_SESSION['poolsT_array'][$id]= $result[0];
+			$_SESSION['polltitle'] = $result[0];
 			
 			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
 			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
@@ -141,40 +146,56 @@ $stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 				$result = $stmt->fetchall();
 				$answers = array();
 				for($j = 0; $j < count($result); $j++) {
-					var_dump($result[$j]);
 					array_push($answers, $result[$j]['Text']);
 				}
 				$_SESSION['q'.$i.'answer'] = $answers;
-
+			}
+		}
+		header("Location: showpoll.php");
 	}
-	header("Location: showpoll.php");
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	function retrievepoll() {
-		
-			if( isset( $_POST['id'])) 
-			{
-		
+	function retrievepollforvote() {
+		global $db;
+		if( isset( $_POST['id'])) {
+			
 			$id = $_POST['id'];
 			$_SESSION['pollid'] = $id;
-			retrievepollbyid($id);
-
-	}
-		header("Location: showpoll.php");
-
-	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	function nextpoll()
-	{
-		if( isset( $_SESSION['pollid'])) {
-			$_SESSION['pollid']++ ;
-			retrievepollbyid($_SESSION['pollid']);
+			
+			$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			$_SESSION['polltitle'] = $result[0];
+			
+			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetchall();
+			$qsts = array();
+			$ids = array();
+			for($i = 0; $i < count($result); $i++) {
+				
+				array_push($ids, $result[$i]['Id']);
+				array_push($qsts, $result[$i]['Text']);
+			}
+			$_SESSION['questions'] = $qsts;
+			for($i = 0; $i < count($ids); $i++) {
+				$stmt = $db->prepare('SELECT Id, Text FROM Answer WHERE QuestionId = :id');
+				$stmt->bindParam(':id',$ids[$i], PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetchall();
+				$answers = array();
+				$ansIds = array();
+				for($j = 0; $j < count($result); $j++) {
+					array_push($answers, $result[$j]['Text']);
+					array_push($ansIds, $result[$j]['Id']);
+				}
+				$_SESSION['q'.$i.'answer'] = $answers;
+				$_SESSION['q'.$i.'answerid'] = $ansIds;
+			}
 		}
-			
-			
-		header("Location: showpoll.php");
+		header("Location: votepoll.php");
 	}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function retrieve_all_owner_polls() {
 		global $db;
@@ -188,11 +209,9 @@ $stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 		
 			$id_array=array();
 			$poolsT_array = array();
-			$owner_array= array();
 			for($i = 0; $i < count($result); $i++) {
 				array_push($id_array, $result[$i]['Id']);
 				array_push($poolsT_array, $result[$i]['Title']);
-				array_push($owner_array, $result[$i]['Owner']);
 			}
 			$_SESSION['poolsT_array']=$poolsT_array;
 			$_SESSION['id_array']=$id_array;
@@ -201,74 +220,90 @@ $stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
 		header("Location: listpolls.php");
 	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	function retrieve_all_polls()
-	{
+	function retrieve_all_polls() {
 		global $db;
 
-			$stmt = $db->prepare('SELECT Id , Title,Owner FROM Poll ');
-			$stmt->execute();
-			$result = $stmt->fetchall();
+		$stmt = $db->prepare('SELECT Id , Title, Owner FROM Poll WHERE PrivatePoll = "public"');
+		$stmt->execute();
+		$result = $stmt->fetchall();
 
-			$poolsT_array=array();
-			$id_array=array();
-			$owner_array= array();
+		$poolsT_array=array();
+		$id_array=array();
+		$owner_array= array();
 
-			for($i = 0; $i < count($result); $i++) {
-				array_push($poolsT_array, $result[$i]['Title']);
-				array_push($owner_array, $result[$i]['Owner']);
-				array_push($id_array, $result[$i]['Id']);
-			}
-			$_SESSION['poolsT_array']=$poolsT_array;
-			$_SESSION['id_array']=$id_array;
-			$_SESSION['owner_array']=$owner_array;
+		for($i = 0; $i < count($result); $i++) {
+			array_push($poolsT_array, $result[$i]['Title']);
+			array_push($owner_array, $result[$i]['Owner']);
+			array_push($id_array, $result[$i]['Id']);
+		}
+		$_SESSION['poolsT_array']=$poolsT_array;
+		$_SESSION['id_array']=$id_array;
+		$_SESSION['owner_array']=$owner_array;
 
 		
 		header("Location: listpolls.php");
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function show_poll_results()
-{
-if(isset($_SESSION['pollid']))
-{
+	function show_poll_results() {
+		if(isset($_SESSION['pollid'])) {
 
-}
-else
-var_dump('no poll assigned');
-}
+		}
+		else
+			var_dump('no poll assigned');
+	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function edit_poll()
-{
-	?>
-	<p> <?php echo $_SESSION['pollid'] ; ?> </p>
-	<button class="add_poll_question">Add More Questions</button>
-			<div id="Questions"> 
-			<?php 
-			echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ;
-			for($i=0; $i < count( $_SESSION['questions'] ) ; $i++)
+	function edit_poll() {
+		?>
+		<p> <?php echo $_SESSION['pollid'] ; ?> </p>
+		<button class="add_poll_question">Add More Questions</button>
+		<div id="Questions"> 
+		<?php 
+		echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ;
+		for($i=0; $i < count( $_SESSION['questions'] ) ; $i++)
+		{
+			echo $_SESSION['questions'][$i];
+			for ($j=0; $j < count($_SESSION['q'.$i.'answer']); $j++ )
 			{
-				echo $_SESSION['questions'][$i];
-				for ($j=0; $j < count($_SESSION['q'.$i.'answer']); $j++ )
-				{
-					echo $_SESSION['q'.$i.'answer'][$j];
-				}
-
+				echo $_SESSION['q'.$i.'answer'][$j];
 			}
-				?>
-			</div>
-			<input type="text" placeholder="<?php echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ?>" >
-			<input type="submit" value="submit">
-			<?php
+
+		}
+			?>
+		</div>
+		<input type="text" placeholder="<?php echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ?>" >
+		<input type="submit" value="submit">
+		<?php
 	///$_SESSION['pollid'] $_SESSION['q'.$i.'answer'] = $answers;$_SESSION['questions'] 
-
-
-}
+	}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function vote_poll()
-{
-	
-}
-
+	function votepoll() {
+		global $db;
+		if( isset($_SESSION['id'])) {
+			$idUser = $_SESSION['id'];
+			$idpoll = $_POST['pollid'];
+			
+			$stmt = $db->prepare('SELECT count(idUtilizador) FROM UtilizadorAnswer WHERE idPoll = :idPoll AND idUtilizador = :iduser');
+			$stmt->bindParam(':iduser',$idUser, PDO::PARAM_STR);
+			$stmt->bindParam(':idPoll',$idpoll, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			
+			if($result[0] > 0) {
+				$_SESSION['error'] = "Failed! You already voted on this Poll";
+			}
+			else {				
+				for($i = 0; $i < $_POST['count']; $i++) {
+					$idAns = $_POST["$i"];
+					$idPol = $_POST['pollid'];
+					$stmt = $db->prepare("INSERT INTO UtilizadorAnswer (idUtilizador, idAnswer, idPoll) VALUES('$idUser','$idAns', '$idPol')");
+					$stmt->execute();
+				}
+				$_SESSION['success'] = "Successfully Voted";
+			}
+		}
+		header("Location: votepoll.php");
+	}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,8 +318,6 @@ function vote_poll()
 			createpoll();
 		else if($method == "retrievepoll")
 			retrievepoll();
-		else if($method == "nextpoll")
-			nextpoll();
 		else if($method == "retrieve_all_owner_polls")
 			retrieve_all_owner_polls();
 		else if($method == "retrieve_all_polls")
@@ -293,6 +326,10 @@ function vote_poll()
 			show_poll_results();
 		else if($method == "edit_poll")
 			edit_poll();
+		else if ($method == "votepoll")
+			votepoll();
+		else if ($method == "retrievepollforvote")
+			retrievepollforvote();
 	}
 	
 	router();

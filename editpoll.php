@@ -4,6 +4,7 @@
 		?>
 		<!-- HTML -->	<p>Title: <?php echo $_SESSION['polltitle']; ?></p>
 		<!-- HTML -->	<p id="questions">Questions:<br>
+		<!-- HTML -->	<form action="controller.php?method=editpoll" method="post">
 		<?php
 		for($i = 0; $i < count($_SESSION['questions']); $i++) {
 			echo "<br>",$_SESSION['questions'][$i]; ?><br>
@@ -18,23 +19,12 @@
 			unset($_SESSION['q'.$i.'answer']);
 		}
 		?>
+		<input type="submit" value="Submit">
+		</form>
 		</p>
-		<form action="controller.php?method=retrievepoll" method="post">
-			<input type="hidden" name="id" value="<?php echo ($_SESSION['pollid']+1); ?>">
-			<input type="submit" value="Next Poll">
-		</form>
-		<form action="controller.php?method=edit_poll" method="post">
-			<input type="submit" value="Edit Mode">
-		</form>
-		<input type="button" onclick="window.location = 'editpoll.php';" value="Edit Poll"/>
-		<form action="controller.php?method=retrievepollforvote" method="post">
-			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
-			<input type="submit" value="Vote This Poll">
-		</form>
 		<?php
 		unset($_SESSION['polltitle']);
 		unset($_SESSION['questions']);
-		unset($_SESSION['pollid']);
 	}
 	else {
 		?>
@@ -46,4 +36,4 @@
 		<?php
 	}
 ?>
-<input type="button" onclick="window.location = 'login.php';" value="Return"/>
+<input type="button" onclick="window.location = 'showpoll.php';" value="Return"/>
