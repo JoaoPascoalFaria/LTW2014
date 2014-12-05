@@ -31,6 +31,9 @@
 		<form action="controller.php?method=retrieve_all_polls" method="post" >
 			<input type="submit" value="Retrive all public polls">
 		</form>
+		<form action="controller.php?method=retrieve_voted_polls" method="post" >
+			<input type="submit" value="Retrive polls I voted">
+		</form>
 		<?php		
 	}
 ?>

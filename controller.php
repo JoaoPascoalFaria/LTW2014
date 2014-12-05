@@ -284,6 +284,28 @@ include("config.php");
 		header("Location: listpolls.php");
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	function retrieve_voted_polls() {
+		global $db;
+		if( isset( $_SESSION['id'])) {
+			
+			$id = $_SESSION['id'];
+			$stmt = $db->prepare('SELECT Id , Title FROM Poll INNER JOIN UtilizadorAnswer ON Poll.Id = UtilizadorAnswer.idPoll AND UtilizadorAnswer.idUtilizador = :id GROUP BY Poll.Id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetchall();
+		
+			$id_array=array();
+			$poolsT_array = array();
+			for($i = 0; $i < count($result); $i++) {
+				array_push($id_array, $result[$i]['Id']);
+				array_push($poolsT_array, $result[$i]['Title']);
+			}
+			$_SESSION['poolsT_array']=$poolsT_array;
+			$_SESSION['id_array']=$id_array;
+		}
+		header("Location: listpolls.php");
+	}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function show_poll_results() {
 		global $db;
 		
@@ -490,6 +512,8 @@ include("config.php");
 			deletepoll();
 		else if($method == "closepoll")
 			closepoll();
+		else if($method == "retrieve_voted_polls")
+			retrieve_voted_polls();
 	}	
 	
 	router();

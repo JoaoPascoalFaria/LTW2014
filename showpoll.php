@@ -57,7 +57,6 @@
 			<input type="hidden" name="id" value="<?php echo ($_SESSION['pollid']+1); ?>">
 			<input type="submit" value="Next Poll">
 		</form>
-		<input type="button" onclick="window.location = 'editpoll.php';" value="Edit Poll"/>
 		<form action="controller.php?method=retrievepollforvote" method="post">
 			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
 			<input type="submit" value="Vote This Poll">
