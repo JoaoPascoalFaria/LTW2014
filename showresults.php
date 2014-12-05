@@ -1,5 +1,11 @@
 <?php session_start();
 	require_once('header.php');
+	if (isset($_SESSION['error'])){
+		?>
+		<!-- HTML -->	<div style="color: red;"><?php echo $_SESSION['error']; ?></div>
+		<?php
+		unset($_SESSION['error']);
+	}
 	if (isset($_SESSION['polltitle'])){
 		
 		?>

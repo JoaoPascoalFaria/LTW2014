@@ -256,8 +256,13 @@ include("config.php");
 		$owner_array= array();
 
 		for($i = 0; $i < count($result); $i++) {
+			$stmt = $db->prepare("SELECT Username FROM Utilizador WHERE IdUser = :idu");
+			$stmt->bindParam(':idu',$result[$i]['Owner'], PDO::PARAM_STR);
+			$stmt->execute();
+			$resultName = $stmt->fetch();
+			
 			array_push($poolsT_array, $result[$i]['Title']);
-			array_push($owner_array, $result[$i]['Owner']);
+			array_push($owner_array, $resultName[0]);
 			array_push($id_array, $result[$i]['Id']);
 		}
 		$_SESSION['poolsT_array']=$poolsT_array;
@@ -286,9 +291,9 @@ include("config.php");
 			}
 			else{
 			
-				$stmt = $db->prepare('SELECT count(idPoll) FROM UtilizadorAnswer WHERE idPoll = :id  and idUtilizador = : idUser');
-				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
-				$stmt->bindParam(':idUser',$_SESSION['id'], PDO::PARAM_STR);
+				$stmt = $db->prepare('SELECT count(idPoll) FROM UtilizadorAnswer WHERE idPoll = :idp AND idUtilizador = :idUser');
+				$stmt->bindParam(':idp', $id, PDO::PARAM_STR);
+				$stmt->bindParam(':idUser', $_SESSION['id'], PDO::PARAM_STR);
 				$stmt->execute();
 				$result = $stmt->fetch();
 				
@@ -343,6 +348,9 @@ include("config.php");
 					$_SESSION['q'.$i.'answercount'] = $counts;
 				}
 			}
+			else {
+				$_SESSION['error']="You do not have rights to view this poll results :(";
+			}
 		}
 		else {
 			$_SESSION['error']='show poll error';
@@ -380,6 +388,48 @@ include("config.php");
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	function deletepoll() {
+		global $db;
+		if(isset( $_POST['id'])) {
+		
+			$id = $_POST['id'];
+		
+			$stmt = $db->prepare('SELECT Owner FROM Poll WHERE Id = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			
+			if( $result[0] == $_SESSION['id'] ) {
+				
+				$stmt = $db->prepare('DELETE from Poll WHERE Id = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();				
+				$_SESSION['success']="You have successfully erased this Poll";
+			}
+			else{
+				$_SESSION['error']="You do not have rights to delete this Poll!";
+			}
+		}
+		header("Location: showpoll.php");
+	}
+	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	function isDomainAvailable($domain) {
+		if(!filter_var($domain, FILTER_VALIDATE_URL)) {
+			return false;
+		}
+		$curlInit = curl_init($domain);
+		curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
+		curl_setopt($curlInit,CURLOPT_HEADER,true);
+		curl_setopt($curlInit,CURLOPT_NOBODY,true);
+		curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
+		//get answer
+		$response = curl_exec($curlInit);
+		curl_close($curlInit);
+		if ($response) return true;
+		return false;		
+	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function router()
 	{
@@ -402,29 +452,9 @@ include("config.php");
 			votepoll();
 		else if ($method == "retrievepollforvote")
 			retrievepollforvote();
-	}
-	
-		function isDomainAvailable($domain)
-	{
-
-	if(!filter_var($domain, FILTER_VALIDATE_URL))
-		{
-			return false;
-		}
-		
-		$curlInit = curl_init($domain);
-		curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
-		curl_setopt($curlInit,CURLOPT_HEADER,true);
-		curl_setopt($curlInit,CURLOPT_NOBODY,true);
-		curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
-		//get answer
-		$response = curl_exec($curlInit);
-		curl_close($curlInit);
-		if ($response) return true;
-		return false;
-	
+		else if($method == "deletepoll")
+			deletepoll();
 	}	
-	
 	
 	router();
 ?>

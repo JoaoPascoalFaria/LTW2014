@@ -1,6 +1,21 @@
 <?php session_start();
 	require_once('header.php');
 	
+	if (isset($_SESSION['error'])){
+		?>
+		<!-- HTML -->	<div style="color: red;"><?php echo $_SESSION['error']; ?></div>
+		<?php
+		unset($_SESSION['error']);
+	}
+	if(isset($_SESSION['success'])) {
+		?>
+		<!-- HTML -->	<div style="color: green;"><?php echo $_SESSION['success']; ?></div> 
+		<!-- HTML -->	<script type='text/javascript'>setTimeout(function() { window.location = "teste.php"; }, 3000);</script>
+		<?php
+		unset($_SESSION['success']);
+	}
+	
+	
 	if (isset($_SESSION['polltitle'])){
 		?>
 	<div class="row row-margin-bottom">
@@ -51,7 +66,14 @@
 			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
 			<input type="submit" value="Show results">
 		</form>
-		
+		<form action="controller.php?method=deletepoll" method="post">
+			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
+			<input type="submit" value="Delete Poll">
+		</form>
+		<form action="controller.php?method=closepoll" method="post">
+			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
+			<input type="submit" value="Close Poll">
+		</form>
 		
 		<?php
 		unset($_SESSION['polltitle']);

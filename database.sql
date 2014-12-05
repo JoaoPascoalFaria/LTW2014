@@ -16,7 +16,6 @@ Id Integer PRIMARY KEY AUTOINCREMENT,
 Owner Integer NOT NULL,
 Title NVARCHAR2(50) Unique NOT NULL,
 Image NVARCHAR2(300) NOT NULL,
-PrivatePoll BOOLEAN NOT NULL,
 FOREIGN KEY (Owner) REFERENCES Utilizador(IdUser)
 );
 
@@ -71,3 +70,16 @@ INSERT INTO Utilizador (Username,Permission,Pword)
 	VALUES ('ZE' ,'1','a722c63db8ec8625af6cf71cb8c2d939'),
 	('JOAO' ,'2','c1572d05424d0ecb2a65ec6a82aeacbf'),
 	('SARA' ,'3','de90022ef728b7f0f6ff92e5d6a90200');
+	
+CREATE TRIGGER delete_poll
+	BEFORE DELETE ON Poll
+	FOR EACH row 
+	begin 
+	delete from Question where Question.PollId= Old.Id;
+	delete from UtilizadorAnswer where UtilizadorAnswer.idPoll= Old.Id;
+	end;
+
+CREATE TRIGGER delete_question
+	BEFORE DELETE ON Question
+	FOR EACH row begin delete from Answer where Answer.QuestionId= Old.Id;
+	end;
