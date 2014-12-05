@@ -1,13 +1,9 @@
 <?php 
 	include 'checklogin.php';
+	require_once('header.php');
 ?>
-<html>
-	<head>
-		<title>Poll</title>
-	</head>
-	<body>
+
 		<div id="content">
-			teste.php > div content
 		</div>
 	</body>
 </html>

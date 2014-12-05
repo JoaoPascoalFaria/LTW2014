@@ -1,12 +1,8 @@
 <?php session_start();
-
+	require_once('header.php');
+	
 	if (isset($_SESSION['polltitle'])){
 		?>
-	<html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="Pollstyle.css">
-	</head>
-	<body>
 	<div class="row row-margin-bottom">
 	<div class="col-md-5 no-padding lib-item" data-category="view">
 		<div class="lib-panel">
@@ -46,20 +42,21 @@
 			<input type="hidden" name="id" value="<?php echo ($_SESSION['pollid']+1); ?>">
 			<input type="submit" value="Next Poll">
 		</form>
-		<form action="controller.php?method=edit_poll" method="post">
-			<input type="submit" value="Edit Mode">
-		</form>
 		<input type="button" onclick="window.location = 'editpoll.php';" value="Edit Poll"/>
 		<form action="controller.php?method=retrievepollforvote" method="post">
 			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
 			<input type="submit" value="Vote This Poll">
 		</form>
-
+		<form action="controller.php?method=show_poll_results" method="post">
+			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
+			<input type="submit" value="Show results">
+		</form>
 		
 		
 		<?php
 		unset($_SESSION['polltitle']);
 		unset($_SESSION['questions']);
+		unset($_SESSION['pollImage']);
 		unset($_SESSION['pollid']);
 	}
 	else {

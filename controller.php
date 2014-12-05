@@ -1,5 +1,7 @@
 <?php session_start();
+require_once('header.php');
 include("config.php");
+
 	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	function register() {
@@ -267,37 +269,87 @@ include("config.php");
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function show_poll_results() {
-		if(isset($_SESSION['pollid'])) {
-
-		}
-		else
-			var_dump('no poll assigned');
-	}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	function edit_poll() {
-		?>
-		<p> <?php echo $_SESSION['pollid'] ; ?> </p>
-		<button class="add_poll_question">Add More Questions</button>
-		<div id="Questions"> 
-		<?php 
-		echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ;
-		for($i=0; $i < count( $_SESSION['questions'] ) ; $i++)
-		{
-			echo $_SESSION['questions'][$i];
-			for ($j=0; $j < count($_SESSION['q'.$i.'answer']); $j++ )
-			{
-				echo $_SESSION['q'.$i.'answer'][$j];
+		global $db;
+		
+		if(isset($_POST['id'])) {
+			$id=$_POST['id'];
+			$stmt = $db->prepare('SELECT Owner FROM Poll WHERE Id = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			
+			$itsOwner = false;
+			$itsVoter =false;
+			if( $result[0] == $_SESSION['id'] ) {
+				
+				$itsOwner = true;
 			}
-
+			else{
+			
+				$stmt = $db->prepare('SELECT count(idPoll) FROM UtilizadorAnswer WHERE idPoll = :id  and idUtilizador = : idUser');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->bindParam(':idUser',$_SESSION['id'], PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetch();
+				
+				if( $result[0] > 0 ) {
+					$itsVoter =true;
+				}
+			}
+			if( $itsOwner or $itsVoter) {
+				
+				$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetch();
+				$_SESSION['polltitle'] = $result[0];
+				
+				$stmt = $db->prepare('SELECT Image FROM Poll WHERE Id = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetch();
+				$_SESSION['pollImage'] = $result[0];
+				
+				$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetchall();
+				$qsts = array();
+				$ids = array();
+				for($i = 0; $i < count($result); $i++) {
+					
+					array_push($ids, $result[$i]['Id']);
+					array_push($qsts, $result[$i]['Text']);
+				}
+				$_SESSION['questions'] = $qsts;
+				for($i = 0; $i < count($ids); $i++) {
+				
+					$stmt = $db->prepare('SELECT Id, Text FROM Answer WHERE QuestionId = :id');
+					$stmt->bindParam(':id',$ids[$i], PDO::PARAM_STR);
+					$stmt->execute();
+					$result = $stmt->fetchall();
+					$answers = array();
+					$counts = array();
+					for($j = 0; $j < count($result); $j++) {
+					
+						array_push($answers, $result[$j]['Text']);
+						$stmt = $db->prepare('SELECT count(idUtilizador) FROM UtilizadorAnswer WHERE idAnswer = :idAnswer');
+						$stmt->bindParam(':idAnswer',$result[$j]['Id'], PDO::PARAM_STR);
+						$stmt->execute();
+						$resultado = $stmt->fetch();
+						array_push($counts, $resultado[0]);
+					}
+					$_SESSION['q'.$i.'answer'] = $answers;
+					$_SESSION['q'.$i.'answercount'] = $counts;
+				}
+			}
 		}
-			?>
-		</div>
-		<input type="text" placeholder="<?php echo $_SESSION['poolsT_array'][$_SESSION['pollid']] ?>" >
-		<input type="submit" value="submit">
-		<?php
-	///$_SESSION['pollid'] $_SESSION['q'.$i.'answer'] = $answers;$_SESSION['questions'] 
+		else {
+			$_SESSION['error']='show poll error';
+		}
+		
+		header("Location: showresults.php");
 	}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function votepoll() {
 		global $db;
@@ -346,8 +398,6 @@ include("config.php");
 			retrieve_all_polls();
 		else if($method == "show_poll_results")
 			show_poll_results();
-		else if($method == "edit_poll")
-			edit_poll();
 		else if ($method == "votepoll")
 			votepoll();
 		else if ($method == "retrievepollforvote")

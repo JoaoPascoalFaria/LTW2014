@@ -33,6 +33,7 @@
 				</p>
 				<?php
 				unset($_SESSION['q'.$i.'answer']);
+				unset($_SESSION['q'.$i.'answerid']);
 			}
 			?>
 			<input type="hidden" name="count" value="<?php echo count($_SESSION['questions']); ?>">
@@ -44,6 +45,7 @@
 			unset($_SESSION['polltitle']);
 			unset($_SESSION['questions']);
 			unset($_SESSION['pollid']);
+			unset($_SESSION['pollImage']);
 		}
 	}
 ?>
