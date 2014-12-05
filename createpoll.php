@@ -27,7 +27,7 @@ require_once('header.php');
 
 				$(add_question).click(function(e){ //on add input button click
 					e.preventDefault();
-					$("div#Questions").append("<div class='poll_wrap' id=" + (x) + "><input type='text' class= 'questionbox' name='question[]'/><a href='#' class='remove_field'>Remove</a> <div id= group"+ (x) +" class='choices_wrap' value=0><a id= button"+x+ " class='add_choice'>Add Choice</a></div></div>"); //add input box
+					$("div#Questions").append("<div class='poll_wrap' id=" + (x) + "><input type='text' class= 'questionbox' name='question[]'/>/*<a href='#' class='remove_field'>Remove</a>*/<div id= group"+ (x) +" class='choices_wrap' value=0><a id= button"+x+ " class='add_choice'>Add Choice</a></div></div>"); //add input box
 					var choicewrapper = document.getElementById( "group"+ x );
 					var choice = document.getElementById( "button"+ x );
 						var q = x-1;//serve para guardar as answers na db

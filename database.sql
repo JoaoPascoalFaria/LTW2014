@@ -16,6 +16,8 @@ Id Integer PRIMARY KEY AUTOINCREMENT,
 Owner Integer NOT NULL,
 Title NVARCHAR2(50) Unique NOT NULL,
 Image NVARCHAR2(300) NOT NULL,
+PrivatePoll BOOLEAN NOT NULL,
+ClosedPoll BOOLEAN NOT NULL DEFAULT FALSE,
 FOREIGN KEY (Owner) REFERENCES Utilizador(IdUser)
 );
 
@@ -42,29 +44,43 @@ CREATE TABLE UtilizadorAnswer (
 INSERT INTO Poll (Owner,Title,Image,PrivatePoll) VALUES
 	('1' ,'Poll1','http://i.imgur.com/C9EXH62.jpg','public'),
 	('1' ,'Poll2','http://i.imgur.com/nScazCd.jpg','public'),
-	('1' ,'Poll3','http://i.imgur.com/YbsUWRR.jpg','private');
+	('2' ,'Poll3','http://i.imgur.com/YbsUWRR.jpg','private'),
+	('2' ,'Again we go','http://i.imgur.com/YbsUWRR.jpg','public');
 	
 INSERT INTO Question (PollId, Text) VALUES
-	('1' ,'Quest1'),
-	('1' ,'Quest2'),
-	('1' ,'Quest3'),
+	('1' ,'What would you be doing if you were not here right now?'),
+	('1' ,'If you could choose any era to live in, what would it be?'),
+	('1' ,'What is your favorite holiday?'),
 	('2' ,'Quest1'),
 	('2' ,'Quest2'),
-	('3' ,'Quest1');
+	('3' ,'Quest1'),
+	('4' ,'All is good?');
 	
 INSERT INTO Answer (QuestionId, Text) VALUES
-	('1' ,'A1'),
-	('1' ,'A2'),
-	('1' ,'A3'),
-	('2' ,'A4'),
-	('3' ,'A5'),
+	('1' ,'The mill rates the slave.'),
+	('1' ,'Without the screen farms a round dragon.'),
+	('1' ,'How will the component fiddle opposite a designed valley?'),
+	('2' ,'The summer undesirable waves.'),
+	('2' ,'A diet prevails above an aided editorial.'),
+	('2' ,'A dubious flour obsesses a visitor with the afraid complaint.'),
+	('3' ,'Christmas.'),
+	('3' ,'Christmas.'),
+	('3' ,'Christmas.'),
 	('4' ,'A6'),
 	('5' ,'A8'),
-	('6' ,'A9');
+	('6' ,'A9'),
+	('7' ,'Yes'),
+	('7' ,'No');
 	
 INSERT INTO UtilizadorAnswer (idUtilizador, idAnswer, idPoll) VALUES
 	('1' ,'1', '1'),
-	('1' ,'2', '1');
+	('1' ,'4', '1'),
+	('1' ,'7', '1'),
+	('3' ,'2', '1'),
+	('3' ,'5', '1'),
+	('3' ,'8', '1'),
+	('2' ,'1', '1'),	
+	('3' ,'13', '4');
 
 INSERT INTO Utilizador (Username,Permission,Pword)
 	VALUES ('ZE' ,'1','a722c63db8ec8625af6cf71cb8c2d939'),

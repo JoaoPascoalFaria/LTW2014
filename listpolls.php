@@ -12,9 +12,9 @@
 				echo "Poll Owner: ", $_SESSION['owner_array'][$i];
 			}
 			?>
-			<form id="my_form" action="controller.php?method=retrievepoll" method="post">
+			<form id="my_form<?php echo $i; ?>" action="controller.php?method=retrievepoll" method="post">
 				<input type="hidden" name="id" value="<?php echo $_SESSION['id_array'][$i]; ?>">
-				<a href="#" onclick="$('#my_form').submit();"><?php echo $_SESSION['poolsT_array'][$i]; ?></a>
+				<a href="#" onclick="$('#my_form<?php echo $i; ?>').submit();"><?php echo $_SESSION['poolsT_array'][$i]; ?></a>
 			</form>
 			<?php
 			echo "</div>";

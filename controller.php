@@ -177,45 +177,57 @@ include("config.php");
 		if( isset( $_POST['id'])) {
 			
 			$id = $_POST['id'];
-			$_SESSION['pollid'] = $id;
 			
-			$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
-			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt = $db->prepare('SELECT ClosedPoll FROM Poll WHERE Id = :idPoll');
+			$stmt->bindParam(':idPoll',$id, PDO::PARAM_STR);
 			$stmt->execute();
 			$result = $stmt->fetch();
-			$_SESSION['polltitle'] = $result[0];
 			
-			$stmt = $db->prepare('SELECT Image FROM Poll WHERE Id = :id');
-			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
-			$stmt->execute();
-			$result = $stmt->fetch();
-			$_SESSION['pollImage'] = $result[0];
-			
-			$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
-			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
-			$stmt->execute();
-			$result = $stmt->fetchall();
-			$qsts = array();
-			$ids = array();
-			for($i = 0; $i < count($result); $i++) {
-				
-				array_push($ids, $result[$i]['Id']);
-				array_push($qsts, $result[$i]['Text']);
+			if($result[0] == "true") {
+				$_SESSION['error'] = "Failed! This Poll is now closed";
 			}
-			$_SESSION['questions'] = $qsts;
-			for($i = 0; $i < count($ids); $i++) {
-				$stmt = $db->prepare('SELECT Id, Text FROM Answer WHERE QuestionId = :id');
-				$stmt->bindParam(':id',$ids[$i], PDO::PARAM_STR);
+			else {
+				
+				$_SESSION['pollid'] = $id;
+				
+				$stmt = $db->prepare('SELECT Title FROM Poll WHERE Id = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetch();
+				$_SESSION['polltitle'] = $result[0];
+				
+				$stmt = $db->prepare('SELECT Image FROM Poll WHERE Id = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();
+				$result = $stmt->fetch();
+				$_SESSION['pollImage'] = $result[0];
+				
+				$stmt = $db->prepare('SELECT Id, Text FROM Question WHERE PollId = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
 				$stmt->execute();
 				$result = $stmt->fetchall();
-				$answers = array();
-				$ansIds = array();
-				for($j = 0; $j < count($result); $j++) {
-					array_push($answers, $result[$j]['Text']);
-					array_push($ansIds, $result[$j]['Id']);
+				$qsts = array();
+				$ids = array();
+				for($i = 0; $i < count($result); $i++) {
+					
+					array_push($ids, $result[$i]['Id']);
+					array_push($qsts, $result[$i]['Text']);
 				}
-				$_SESSION['q'.$i.'answer'] = $answers;
-				$_SESSION['q'.$i.'answerid'] = $ansIds;
+				$_SESSION['questions'] = $qsts;
+				for($i = 0; $i < count($ids); $i++) {
+					$stmt = $db->prepare('SELECT Id, Text FROM Answer WHERE QuestionId = :id');
+					$stmt->bindParam(':id',$ids[$i], PDO::PARAM_STR);
+					$stmt->execute();
+					$result = $stmt->fetchall();
+					$answers = array();
+					$ansIds = array();
+					for($j = 0; $j < count($result); $j++) {
+						array_push($answers, $result[$j]['Text']);
+						array_push($ansIds, $result[$j]['Id']);
+					}
+					$_SESSION['q'.$i.'answer'] = $answers;
+					$_SESSION['q'.$i.'answerid'] = $ansIds;
+				}
 			}
 		}
 		header("Location: votepoll.php");
@@ -239,7 +251,6 @@ include("config.php");
 			}
 			$_SESSION['poolsT_array']=$poolsT_array;
 			$_SESSION['id_array']=$id_array;
-			$_SESSION['owner_array']=$owner_array;
 		}
 		header("Location: listpolls.php");
 	}
@@ -361,9 +372,10 @@ include("config.php");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function votepoll() {
 		global $db;
-		if( isset($_SESSION['id'])) {
-			$idUser = $_SESSION['id'];
+		
+		if( isset($_SESSION['id'])) {	
 			$idpoll = $_POST['pollid'];
+			$idUser = $_SESSION['id'];
 			
 			$stmt = $db->prepare('SELECT count(idUtilizador) FROM UtilizadorAnswer WHERE idPoll = :idPoll AND idUtilizador = :iduser');
 			$stmt->bindParam(':iduser',$idUser, PDO::PARAM_STR);
@@ -386,9 +398,7 @@ include("config.php");
 		}
 		header("Location: votepoll.php");
 	}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
 	function deletepoll() {
 		global $db;
 		if(isset( $_POST['id'])) {
@@ -405,7 +415,7 @@ include("config.php");
 				$stmt = $db->prepare('DELETE from Poll WHERE Id = :id');
 				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
 				$stmt->execute();				
-				$_SESSION['success']="You have successfully erased this Poll";
+				$_SESSION['success']="You have successfully deleted this Poll";
 			}
 			else{
 				$_SESSION['error']="You do not have rights to delete this Poll!";
@@ -413,7 +423,6 @@ include("config.php");
 		}
 		header("Location: showpoll.php");
 	}
-	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function isDomainAvailable($domain) {
 		if(!filter_var($domain, FILTER_VALIDATE_URL)) {
@@ -429,6 +438,31 @@ include("config.php");
 		curl_close($curlInit);
 		if ($response) return true;
 		return false;		
+	}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	function closepoll() {
+		global $db;
+		if(isset( $_POST['id'])) {
+		
+			$id = $_POST['id'];
+		
+			$stmt = $db->prepare('SELECT Owner FROM Poll WHERE Id = :id');
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			$stmt->execute();
+			$result = $stmt->fetch();
+			
+			if( $result[0] == $_SESSION['id'] ) {
+				
+				$stmt = $db->prepare('UPDATE Poll SET ClosedPoll = \'TRUE\' WHERE Id = :id');
+				$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+				$stmt->execute();				
+				$_SESSION['success']="You have successfully closed this Poll";
+			}
+			else{
+				$_SESSION['error']="You do not have rights to close this Poll!";
+			}
+		}
+		header("Location: showpoll.php");
 	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function router()
@@ -454,6 +488,8 @@ include("config.php");
 			retrievepollforvote();
 		else if($method == "deletepoll")
 			deletepoll();
+		else if($method == "closepoll")
+			closepoll();
 	}	
 	
 	router();
