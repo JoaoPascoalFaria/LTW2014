@@ -9,11 +9,11 @@ include("config.php");
 	
 		if( isset($_POST['name'])){
 			
-			$name = strtoupper($_POST['name']);
+			$name = $_POST['name'];
 			$pw = $_POST['pw'];
 			
-			$stmt = $db->prepare('SELECT count(IdUser) FROM Utilizador WHERE username = :user');
-			$stmt->bindParam(':user',$name, PDO::PARAM_STR);
+			$stmt = $db->prepare('SELECT count(IdUser) FROM Utilizador WHERE UPPER(username) = :user');
+			$stmt->bindParam(':user',strtoupper($name), PDO::PARAM_STR);
 			$stmt->execute();
 			$result = $stmt->fetch();
 			
@@ -38,7 +38,7 @@ include("config.php");
 	function login() {
 		global $db;
 		
-		$username = strtoupper($_POST['username']);
+		$username = $_POST['username'];
 		$pword = $_POST['pword'];
 		$encryptedPass = md5($pword);
 		$stmt = $db->prepare('SELECT count(IdUser), Permission, IdUser FROM Utilizador WHERE username = :user AND pword = :pword');
@@ -66,6 +66,7 @@ include("config.php");
 			$title = $_POST['title'];
 			$qst = $_POST['question'];
 			$priv = $_POST['Polltype'];
+			$imag = $_POST['image'];
 			$user = $_SESSION['username'];
 			
 			$stmt = $db->prepare('SELECT count(Id) FROM Poll WHERE Title = :titl');
@@ -80,9 +81,11 @@ include("config.php");
 				/* Poll */
 				
 				//Cenas referente a imagem 
-				if(isDomainAvailable($imag)){}
-				else
-				{$imag = 'images/default.jpg';}
+				if(isDomainAvailable($imag)){
+				}
+				else{
+					$imag = 'images/default.jpg';
+				}
 				
 				$userID = $_SESSION['id'];
 				$stmt = $db->prepare("INSERT INTO Poll (Owner,Title,Image,PrivatePoll) VALUES('$userID','$title','$imag','$priv')");
@@ -369,6 +372,7 @@ include("config.php");
 		curl_close($curlInit);
 		if ($response) return true;
 		return false;
+	
 	}	
 	
 	
