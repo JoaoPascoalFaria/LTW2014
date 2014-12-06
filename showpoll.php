@@ -48,11 +48,7 @@
 		?>
 		
 		</p>
-						</div>
-					</div>
-				</div>
-			</div>
-        </div>
+					
 		<form action="controller.php?method=retrievepoll" method="post">
 			<input type="hidden" name="id" value="<?php echo ($_SESSION['pollid']+1); ?>">
 			<input type="submit" value="Next Poll">
@@ -73,7 +69,11 @@
 			<input type="hidden" name="id" value="<?php echo $_SESSION['pollid']; ?>">
 			<input type="submit" value="Close Poll">
 		</form>
-		
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
 		<?php
 		unset($_SESSION['polltitle']);
 		unset($_SESSION['questions']);

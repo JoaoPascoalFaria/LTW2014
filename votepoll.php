@@ -16,7 +16,19 @@
 	else {
 		if (isset($_SESSION['polltitle'])){
 			?>
+			<div class="row row-margin-bottom">
+				<div class="col-md-5 no-padding lib-item" data-category="view">
+					<div class="lib-panel">
+						<div class="row box-shadow">
+							<div class="col-md-6">   
+		<!-- HTML -->	<img class="lib-img-show" src= "<?php echo $_SESSION['pollImage']; ?>">		
+						</div>
+					<div class="col-md-6">
+						<div class="lib-row lib-header">					
 			<!-- HTML -->	<p>Title: <?php echo $_SESSION['polltitle']; ?></p>
+				<div class="lib-header-seperator"></div>
+						  </div>
+						  <div class="lib-row lib-desc">
 			<!-- HTML -->	<p id="questions">Questions:<br>
 			<form action="controller.php?method=votepoll" method="post">
 			<?php
@@ -36,6 +48,11 @@
 				unset($_SESSION['q'.$i.'answerid']);
 			}
 			?>
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
 			<input type="hidden" name="count" value="<?php echo count($_SESSION['questions']); ?>">
 			<input type="hidden" name="pollid" value="<?php echo $_SESSION['pollid']; ?>">
 			<input type="submit" value="Vote!">
